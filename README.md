@@ -211,69 +211,54 @@ npm run typecheck:tests
 
 ---
 
-## 10. Guía Paso a Paso de Despliegue en Producción
+## 10. Arquitectura de Despliegue e Infraestructura Cloud
 
-### A. Configuración en Supabase (Base de Datos & Storage)
-1. Crear un proyecto en [Supabase Console](https://supabase.com) en región cercana (`us-east-1`).
-2. En **Project Settings > Database**, obtener:
-   - **Transaction Pooler (puerto 6543 con `?pgbouncer=true`)** para `DATABASE_URL`.
-   - **Session Pooler (puerto 5432 en el mismo host pooler - NO `db.<ref>.supabase.co`)** para `DIRECT_URL`.
-3. En **Storage > Buckets**:
-   - Crear el bucket `case-images` público.
-   - Configurar políticas: lectura pública (`"Public Access"`) y subida autenticada (`"Authenticated Upload"`).
-4. En **Project Settings > API**, copiar la URL del proyecto y la llave secreta `service_role`.
+El ecosistema de producción del backend opera sobre una arquitectura desacoplada basada en la nube:
 
-### B. Despliegue en Render (Web Service)
-1. En [Render Dashboard](https://dashboard.render.com), seleccionar **New > Web Service** desde repositorio público de Git.
-2. Repositorio: `https://github.com/Juanexzz/sistema-investigacion-criminal-backend` (rama `main`).
-3. Configuración del servicio:
-   - **Runtime**: `Node`
-   - **Build Command**:
-     ```bash
-     npm ci --include=dev && npx prisma generate && npx prisma migrate deploy && npm run build
-     ```
-   - **Start Command**:
-     ```bash
-     npm start
-     ```
-   - **Health Check Path** (en sección *Advanced*): `/api/health`
-4. En **Environment Variables**, definir:
-   - `NODE_ENV`: `production`
-   - `DATABASE_URL`: *(Cadena de conexión Transaction pooler puerto 6543 con `?pgbouncer=true`)*
-   - `DIRECT_URL`: *(Cadena de conexión Session pooler puerto 5432)*
-   - `JWT_SECRET`: *(Cadena secreta segura de alta entropía con al menos 32 caracteres)*
-   - `JWT_EXPIRES_IN`: `1d`
-   - `CORS_ORIGIN`: `https://sistema-investigacion-criminal-fron.vercel.app` *(Exacto, sin barra final)*
-   - `SUPABASE_URL`: `https://[PROJECT_REF].supabase.co`
-   - `SUPABASE_SERVICE_ROLE_KEY`: *(Llave service_role secreta de Supabase)*
-   - `SUPABASE_BUCKET`: `case-images`
+### 10.1. Topología de Servicios
+- **Capa de Cómputo (PaaS - Render Web Service)**: Servicio web contenerizado en Node.js 24 con despliegue continuo (Continuous Deployment) vinculado a la rama `main` del repositorio.
+- **Capa de Persistencia Relacional (BaaS - Supabase PostgreSQL)**: Base de datos PostgreSQL gestionada en la nube con arquitectura de doble enrutador de conexiones (Connection Pooling):
+  - **Transaction Pooler (Puerto 6543 con PgBouncer)**: Asignado a `DATABASE_URL` para maximizar la concurrencia y mitigar la sobrecarga de conexiones efímeras en las peticiones HTTP del backend.
+  - **Session Pooler (Puerto 5432)**: Asignado a `DIRECT_URL` para permitir la ejecución de transacciones DDL, sentencias de migración de esquema con Prisma Migrate y scripts de aprovisionamiento.
+- **Capa de Almacenamiento de Objetos (Supabase Storage)**: Bucket pericial `case-images` configurado con políticas de seguridad a nivel de fila (RLS) para lectura pública y mutación autorizada.
 
-### C. Ejecución del Seed en Producción
-Dado que la terminal Shell no está disponible en el plan gratuito de Render, el seed inicial debe ejecutarse de forma local y segura contra la base de datos de producción:
-
-**En Windows PowerShell:**
-```powershell
-$env:DATABASE_URL="postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true"
-$env:DIRECT_URL="postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"
-npm run prisma:seed
-```
-
-**En Linux / macOS (Bash):**
+### 10.2. Pipeline Automatizado de Construcción y Migración (CI/CD)
+Cada confirmación en la rama `main` dispara automáticamente la siguiente secuencia de construcción en el pipeline de despliegue:
 ```bash
-DATABASE_URL="postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true" \
-DIRECT_URL="postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres" \
-npm run prisma:seed
+npm ci --include=dev && npx prisma generate && npx prisma migrate deploy && npm run build
 ```
+1. **Instalación Reproducible (`npm ci --include=dev`)**: Garantiza la presencia exacta de dependencias de compilación y tipado (`typescript`, `@types/*`).
+2. **Generación de Artefactos Tipados (`prisma generate`)**: Sincroniza el cliente ORM fuertemente tipado según el esquema `schema.prisma`.
+3. **Migraciones Atómicas (`prisma migrate deploy`)**: Aplica migraciones SQL pendientes sin intervención manual directa sobre la base de datos.
+4. **Compilación de Producción (`npm run build`)**: Transpila el código fuente TypeScript de `src/` a JavaScript optimizado en `dist/`.
 
-### D. Despertar el Servicio de Render antes de la Sustentación
-El plan gratuito de Render suspende los servicios inactivos después de 15 minutos. Para activarlo antes de una presentación o prueba:
-1. Abrir en el navegador: `https://sistema-investigacion-criminal-backend.onrender.com/api/health`
-2. Esperar entre 30 y 50 segundos hasta recibir:
-   ```json
-   {
-     "status": "ok",
-     "service": "Sistema de Investigación Criminal API",
-     "timestamp": "2026-11-10T..."
-   }
-   ```
-3. Una vez responda HTTP 200, la API permanecerá activa para la sustentación.
+El contenedor arranca mediante `npm start` (`node dist/index.js`), con monitoreo perimetral periódico a través del punto de verificación `/api/health`.
+
+### 10.3. Matriz de Variables de Entorno en Producción
+| Variable | Descripción Arquitectónica |
+| :--- | :--- |
+| `NODE_ENV` | Modo de ejecución del runtime (`production`). |
+| `PORT` | Puerto de escucha asignado dinámicamente por la plataforma de hosting (`4000` o asignado por el host). |
+| `DATABASE_URL` | Enlace al Transaction Pooler (puerto 6543) optimizado para transacciones ACID de la API. |
+| `DIRECT_URL` | Enlace al Session Pooler (puerto 5432) utilizado exclusivamente para DDL y migraciones. |
+| `JWT_SECRET` | Llave criptográfica de alta entropía ($\ge 32$ caracteres) para firma y verificación de tokens. |
+| `JWT_EXPIRES_IN` | Tiempo de vida de los tokens de acceso (`1d`). |
+| `CORS_ORIGIN` | Origen autorizado estricto (`https://sistema-investigacion-criminal-fron.vercel.app`), mitigando accesos de orígenes no confiables. |
+| `SUPABASE_URL` | Endpoint base del proyecto Supabase para la API de Storage. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Credencial administrativa con privilegios para gestión segura de buckets y firmas de subida. |
+| `SUPABASE_BUCKET` | Identificador del contenedor de objetos periciales (`case-images`). |
+
+### 10.4. Monitoreo y Verificación Operativa de la API
+El estado operativo del servicio y la conectividad a la infraestructura pueden auditarse mediante el endpoint público de diagnóstico:
+```http
+GET /api/health HTTP/1.1
+Host: sistema-investigacion-criminal-backend.onrender.com
+```
+Respuesta esperada (HTTP 200 OK):
+```json
+{
+  "status": "ok",
+  "service": "Sistema de Investigación Criminal API",
+  "timestamp": "2026-11-10T22:21:37.754Z"
+}
+```
