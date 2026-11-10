@@ -20,6 +20,8 @@ API REST construida con **Node.js 20, Express, TypeScript estricto, Prisma ORM y
 - **Backend en Producción (Render)**: `https://[COMPLETAR_POR_EL_EQUIPO].onrender.com`
 - **Ruta de Verificación de Salud (Health Check)**: `https://[COMPLETAR_POR_EL_EQUIPO].onrender.com/api/health`
 - **Frontend en Producción (Vercel)**: `https://[COMPLETAR_POR_EL_EQUIPO].vercel.app`
+- **Repositorio Hermano (Frontend)**: https://github.com/Juanexzz/sistema-investigacion-criminal-frontend
+- **Monorepo Original**: https://github.com/juanfer2006/patria_milagro_web
 
 ---
 
@@ -95,10 +97,7 @@ Todas las rutas privadas exigen cabecera `Authorization: Bearer <token>`. Las re
 
 ## 7. Instalación y Ejecución Local
 
-1. Acceder a la carpeta del backend:
-   ```bash
-   cd backend
-   ```
+1. Ubicarse en la raíz del repositorio backend.
 2. Instalar dependencias exactas:
    ```bash
    npm ci
@@ -141,7 +140,6 @@ Todas las rutas privadas exigen cabecera `Authorization: Bearer <token>`. Las re
 1. En [Render Dashboard](https://dashboard.render.com), seleccionar **New > Web Service**.
 2. Conectar el repositorio de GitHub y seleccionar la rama `main` (o `develop`).
 3. Configurar los siguientes parámetros:
-   - **Root Directory**: `backend`
    - **Environment**: `Node`
    - **Build Command**:
      ```bash
