@@ -3,6 +3,7 @@ import cors from 'cors';
 import { env } from './config/env.js';
 import { createApiRouter } from './interface/routers/index.js';
 import { errorHandler } from './interface/middlewares/error-handler.middleware.js';
+import { notFoundHandler } from './interface/middlewares/not-found.middleware.js';
 
 export function createApp(): Express {
   const app = express();
@@ -21,6 +22,9 @@ export function createApp(): Express {
 
   // Montar rutas de la API bajo /api
   app.use('/api', createApiRouter());
+
+  // Middleware 404 en formato JSON para rutas desconocidas
+  app.use(notFoundHandler);
 
   // Manejador centralizado de errores
   app.use(errorHandler);

@@ -18,6 +18,22 @@ function isPrismaError(error: unknown): error is PrismaClientKnownRequestErrorLi
   );
 }
 
+interface BodyParserErrorLike {
+  type: string;
+  status?: number;
+  statusCode?: number;
+  message: string;
+}
+
+function isBodyParserError(error: unknown): error is BodyParserErrorLike {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'type' in error &&
+    typeof (error as { type: unknown }).type === 'string'
+  );
+}
+
 export function errorHandler(
   err: unknown,
   _req: Request,
@@ -25,6 +41,29 @@ export function errorHandler(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction,
 ): void {
+  // Manejo de errores de body-parser (JSON malformado o payload demasiado grande)
+  if (isBodyParserError(err)) {
+    if (err.type === 'entity.parse.failed') {
+      res.status(400).json({
+        error: {
+          code: 'BAD_REQUEST',
+          message: 'El cuerpo de la solicitud no contiene un formato JSON válido',
+        },
+      });
+      return;
+    }
+
+    if (err.type === 'entity.too.large') {
+      res.status(413).json({
+        error: {
+          code: 'PAYLOAD_TOO_LARGE',
+          message: 'La carga útil de la solicitud excede el tamaño máximo permitido',
+        },
+      });
+      return;
+    }
+  }
+
   // Manejo de errores de la aplicación
   if (err instanceof AppError) {
     res.status(err.statusCode).json({
