@@ -127,6 +127,20 @@ describe('Cases DTOs Validation', () => {
     });
   });
 
+  
+    it('debe devolver mensaje exacto de error cuando falta la descripción', () => {
+      const result = createCaseBodySchema.safeParse({
+        title: 'Caso de prueba',
+        location: 'Medellín',
+        incidentDate: '2026-11-06T12:00:00Z',
+      });
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const descErr = result.error.errors.find((e) => e.path.includes('description'));
+        expect(descErr?.message).toBe('La descripción es obligatoria');
+      }
+    });
+
   describe('updateCaseBodySchema', () => {
     it('debe permitir null para imageUrl para desvincular imagen', () => {
       const result = updateCaseBodySchema.safeParse({

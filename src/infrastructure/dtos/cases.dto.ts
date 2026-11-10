@@ -9,7 +9,7 @@ export const createCaseBodySchema = z.object({
     .min(3, 'El título debe tener al menos 3 caracteres')
     .max(120, 'El título no puede exceder 120 caracteres'),
   description: z
-    .string({ required_error: 'La descripción es obligatorio' })
+    .string({ required_error: 'La descripción es obligatoria' })
     .trim()
     .min(10, 'La descripción debe tener al menos 10 caracteres')
     .max(2000, 'La descripción no puede exceder 2000 caracteres'),
@@ -39,7 +39,7 @@ export const updateCaseBodySchema = z.object({
     .min(3, 'El título debe tener al menos 3 caracteres')
     .max(120, 'El título no puede exceder 120 caracteres'),
   description: z
-    .string({ required_error: 'La descripción es obligatorio' })
+    .string({ required_error: 'La descripción es obligatoria' })
     .trim()
     .min(10, 'La descripción debe tener al menos 10 caracteres')
     .max(2000, 'La descripción no puede exceder 2000 caracteres'),
