@@ -17,9 +17,9 @@ API REST construida con **Node.js 20, Express, TypeScript estricto, Prisma ORM y
 ## 2. Enlaces de Despliegue
 
 > Los enlaces definitivos de despliegue son configurados por el equipo en producción:
-- **Backend en Producción (Render)**: `https://[COMPLETAR_POR_EL_EQUIPO].onrender.com`
-- **Ruta de Verificación de Salud (Health Check)**: `https://[COMPLETAR_POR_EL_EQUIPO].onrender.com/api/health`
-- **Frontend en Producción (Vercel)**: `https://[COMPLETAR_POR_EL_EQUIPO].vercel.app`
+- **Backend en Producción (Render)**: `https://sistema-investigacion-criminal-backend.onrender.com`
+- **Ruta de Verificación de Salud (Health Check)**: `https://sistema-investigacion-criminal-backend.onrender.com/api/health`
+- **Frontend en Producción (Vercel)**: `https://sistema-investigacion-criminal-fron.vercel.app`
 - **Repositorio Hermano (Frontend)**: https://github.com/Juanexzz/sistema-investigacion-criminal-frontend
 - **Monorepo Original**: https://github.com/juanfer2006/patria_milagro_web
 
@@ -160,8 +160,8 @@ Todas las rutas privadas exigen cabecera `Authorization: Bearer <token>`. Las re
    - `SUPABASE_URL`: *(URL de Supabase)*
    - `SUPABASE_SERVICE_ROLE_KEY`: *(Llave service_role de Supabase)*
    - `SUPABASE_BUCKET`: `case-images`
-5. Ejecutar el seed una vez en Render:
-   - Ir a la pestaña **Shell** del servicio en Render y ejecutar:
+5. Ejecutar el seed oficial de la base de datos:
+   - Debido a que la pestaña Shell no está disponible en el plan gratuito de Render, el seed se ejecuta de manera local y segura contra la base de datos de producción con DATABASE_URL y DIRECT_URL exportadas en la sesión:
      ```bash
      npm run prisma:seed
      ```
@@ -169,7 +169,7 @@ Todas las rutas privadas exigen cabecera `Authorization: Bearer <token>`. Las re
 ### C. Despertar el Servicio de Render antes de la Sustentación
 Debido a que el plan gratuito de Render suspende los servicios inactivos después de 15 minutos, se debe despertar la API antes de la demo:
 1. Abrir en el navegador la ruta de salud:
-   `https://[COMPLETAR_POR_EL_EQUIPO].onrender.com/api/health`
+   `https://sistema-investigacion-criminal-backend.onrender.com/api/health`
 2. Esperar aproximadamente 30 a 50 segundos hasta recibir la respuesta:
    ```json
    {
