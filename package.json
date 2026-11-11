@@ -1,7 +1,7 @@
 {
   "name": "sistema-investigacion-criminal-backend",
   "version": "1.0.0",
-  "description": "Backend para Sistema de Investigación Criminal - Fundación y Autenticación",
+  "description": "API REST del Sistema de Investigación Criminal con Express, TypeScript y Prisma",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",

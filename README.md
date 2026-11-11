@@ -1,59 +1,98 @@
-# Sistema de Investigación Criminal &mdash; API Backend
+# Sistema de Investigación Criminal &mdash; Backend API
 
 > Proyecto de Aula: Desarrollo Web Full-Stack &amp; Paradigmas de Programación (Semestre 2026-2)  
-> Estilo Visual y Temático: **Expediente Forense Noir**
+> Implementación del Backend: **Node.js, Express, TypeScript estricto, Prisma ORM y PostgreSQL**
 
 ---
 
-## 1. Descripción del Proyecto
+## 1. Cómo Probar la Aplicación
 
-API REST construida con **Node.js 20, Express, TypeScript estricto, Prisma ORM y PostgreSQL**. Proporciona el núcleo de dominio, persistencia relacional, seguridad mediante tokens JWT propios de alta entropía, administración de identidades, almacenamiento pericial en Supabase Storage y la gestión de investigaciones criminales estructurada en tres recursos principales:
-- **Casos criminales**: Apertura formal (`CR-0001`), cronología pericial, lugar de los hechos, fotografía de la escena y estados procesales (`OPEN`, `IN_PROGRESS`, `CLOSED`).
-- **Sospechosos / Personas de interés**: Fichas delictivas, nivel de sospecha (0 a 100), alias y fotografías periciales.
-- **Evidencias materiales y peritaje**: Clasificación tipificada (`PHYSICAL`, `DIGITAL`, `DOCUMENT`, `TESTIMONY`, `FORENSIC`), escala de relevancia probatoria (1 a 5), registro fotográfico en almacenamiento binario (Supabase Storage) y vinculación a personas de interés del caso.
+### Opción A: Probar en Producción (Recomendada para Evaluación)
+1. **Despertar el servicio en Render**:  
+   Abrir en el navegador el endpoint de salud:  
+   👉 [https://sistema-investigacion-criminal-backend.onrender.com/api/health](https://sistema-investigacion-criminal-backend.onrender.com/api/health)  
+   Esperar entre 30 y 50 segundos hasta que responda:
+   ```json
+   {
+     "status": "ok",
+     "service": "Sistema de Investigación Criminal API",
+     "timestamp": "2026-11-10T..."
+   }
+   ```
+2. **Acceder a la aplicación web en Vercel**:  
+   👉 [https://sistema-investigacion-criminal-fron.vercel.app](https://sistema-investigacion-criminal-fron.vercel.app)
+3. **Iniciar sesión con las credenciales de prueba**:
+   - **Detective**: `detective@forense.test` | Contraseña: `Detective2026!`
+   - **Administrador**: `admin@forense.test` | Contraseña: `Admin2026!`
 
 ---
 
-## 2. Enlaces de Despliegue y Repositorios
+### Opción B: Ejecución en Entorno Local
+1. **Levantar primero el backend**:
+   ```bash
+   cd sistema-investigacion-criminal-backend
+   cp .env.example .env
+   # Configurar cadenas de conexión de base de datos en .env
+   npm ci
+   npm run prisma:generate
+   npm run prisma:migrate
+   npm run prisma:seed
+   npm run dev
+   ```
+   El servidor API iniciará en `http://localhost:4000`.
 
-- **Backend en Producción (Render)**: `https://sistema-investigacion-criminal-backend.onrender.com`
-- **Ruta de Verificación de Salud (Health Check)**: `https://sistema-investigacion-criminal-backend.onrender.com/api/health`
+2. **Levantar el frontend**:
+   ```bash
+   cd ../sistema-investigacion-criminal-frontend
+   cp .env.example .env.local
+   # Asegurar que NEXT_PUBLIC_API_HOST=http://localhost:4000
+   npm ci
+   npm run dev
+   ```
+   Abrir en el navegador: [http://localhost:3000](http://localhost:3000).
+
+---
+
+## 2. Enlaces del Proyecto
+
+- **API en Producción (Render)**: `https://sistema-investigacion-criminal-backend.onrender.com`
+- **Health Check de la API**: `https://sistema-investigacion-criminal-backend.onrender.com/api/health`
 - **Frontend en Producción (Vercel)**: `https://sistema-investigacion-criminal-fron.vercel.app`
-- **Repositorio Hermano (Frontend)**: [sistema-investigacion-criminal-frontend](https://github.com/Juanexzz/sistema-investigacion-criminal-frontend)
-- **Monorepo Original Central**: [patria_milagro_web](https://github.com/juanfer2006/patria_milagro_web)
+- **Repositorio Frontend (GitHub)**: https://github.com/Juanexzz/sistema-investigacion-criminal-frontend
+- **Monorepo Histórico Original**: https://github.com/juanfer2006/patria_milagro_web
 
 ---
 
 ## 3. Reparto de Trabajo (Equipo de 4 Integrantes)
 
-| Integrante | Responsabilidad | Responsabilidades Principales |
+| Integrante | Responsabilidad | Aportes Principales |
 | :--- | :--- | :--- |
-| **Juan Fernando Castañeda Agudelo** | **Líder de Proyecto / Arquitectura Backend** | **Fundación y arquitectura en 4 capas, autenticación JWT, usuarios admin, migraciones Prisma, seed oficial y políticas de acceso.** |
-| **Juan Esteban Vallejo Hincapié** | **Infraestructura, Casos & Uploads** | **Módulo de Casos (`/api/cases`), subida de archivos binarios a Supabase Storage (`/api/uploads`), detalle de expediente e integración de imágenes, y despliegue de infraestructura en producción (Render, Supabase y Vercel).** |
-| **Camilo Gutiérrez Castañeda** | **Sospechosos & Retroalimentación** | **Módulo de Sospechosos (`/api/suspects`), componentes de retroalimentación modal/confirmación y estados de interfaz.** |
-| **José Daniel Morales Villegas** | **Evidencias & Sistema de Diseño** | **Módulo de Evidencias de punta a punta (`/api/evidences`), Landing Page pericial, sistema de diseño noir, variables CSS, componentes UI base, Navbar y Footer.** |
+| **Juan Esteban Vallejo Hincapié** | **Despliegue, Infraestructura y Casos** | **Despliegue del backend en Render, configuración de variables de entorno y poolers de Supabase, pipeline de build con migraciones automáticas, y módulo de casos (`/api/cases`).** |
+| **Juan Fernando Castañeda Agudelo** | **Líder de Proyecto y Arquitectura** | **Fundación del proyecto, arquitectura limpia en 4 capas, autenticación JWT, hashing con bcrypt, middlewares (`auth`, `validate`, `error-handler`, `not-found`) y módulo de usuarios (`/api/users`).** |
+| **Camilo Gutiérrez Castañeda** | **Sospechosos y Validación DTO** | **Módulo de personas de interés (`/api/suspects`), cálculo de nivel de sospecha (0-100), reglas de negocio de casos cerrados y pruebas unitarias de casos de uso.** |
+| **José Daniel Morales Villegas** | **Evidencias y Almacenamiento** | **Módulo de evidencias (`/api/evidences`), tipificación y relevancia, servicio de almacenamiento en Supabase Storage (`/api/uploads`), subida de imágenes con Multer y catálogo de pruebas HTTP.** |
 
 ---
 
-## 4. Arquitectura de Software en 4 Capas
+## 4. Arquitectura Limpia en 4 Capas
 
-El backend implementa una arquitectura limpia por capas desacopladas, garantizando separación de responsabilidades y facilidad de pruebas:
+El backend implementa los principios de Arquitectura Limpia (*Clean Architecture*) y diseño guiado por el dominio (*DDD*), manteniendo la lógica de negocio desacoplada de la base de datos y de los frameworks HTTP:
 
 ```
 src/
-├── domain/                  # Capa 1: Dominio (Núcleo Puro)
-│   ├── models/              # Modelos y entidades de negocio (User, Case, Suspect, Evidence)
-│   ├── repository/          # Interfaces de repositorios (ICaseRepository, ISuspectRepository, etc.)
-│   └── services/            # Interfaces de servicios de dominio (ITokenService, IPasswordHasher)
-├── application/             # Capa 2: Aplicación (Casos de Uso)
-│   ├── errors/              # Jerarquía de errores estandarizados (AppError, ValidationError, etc.)
-│   └── use-cases/           # Casos de uso atómicos (auth, cases, suspects, evidences, users, uploads)
+├── domain/                  # Capa 1: Dominio (Entidades y Reglas de Negocio Puras)
+│   ├── errors/              # Errores tipados de dominio (ConflictError, NotFoundError, etc.)
+│   ├── models/              # Modelos de dominio puros (User, Case, Suspect, Evidence)
+│   ├── repositories/        # Interfaces abstractas de repositorios (ICaseRepository, etc.)
+│   └── services/            # Interfaces de servicios de dominio (IPasswordHasher, ITokenService)
+├── application/             # Capa 2: Aplicación (Casos de Uso del Sistema)
+│   └── use-cases/           # Orquestación de casos de uso (auth, cases, suspects, evidences, users, uploads)
 ├── infrastructure/          # Capa 3: Infraestructura (Implementación Técnica)
 │   ├── dtos/                # Validación de esquemas con Zod para entradas y filtros
 │   ├── repository/          # Implementaciones con Prisma ORM (PrismaCaseRepository, etc.)
-│   └── services/            # Servicios concretos (JwtTokenService, BcryptPasswordHasher, SupabaseUpload)
+│   └── services/            # Servicios concretos (JwtTokenService, BcryptPasswordHasher, SupabaseStorageService)
 └── interface/               # Capa 4: Interfaces (Adaptadores de Entrada HTTP)
-    ├── controllers/         # Controladores de Express para orquestar casos de uso
+    ├── controllers/         # Controladores de Express para transformar DTOs y llamar casos de uso
     ├── middlewares/         # Middlewares (auth, validate, error-handler, not-found, upload)
     └── routers/             # Enrutadores modulares de Express agrupados bajo /api
 ```
@@ -62,18 +101,18 @@ src/
 
 ## 5. Credenciales de Prueba Oficiales (Seed)
 
-El seed genera cuentas idempotentes bajo el dominio reservado `.test` para pruebas académicas y sustentación final:
+El script de seed genera cuentas de prueba idempotentes para la evaluación del sistema:
 
 | Rol | Correo Electrónico | Contraseña | Permisos y Alcance |
 | :--- | :--- | :--- | :--- |
-| **ADMIN** | `admin@forense.test` | `Admin2026!` | Comisario: acceso total a todos los casos, sospechosos, evidencias y panel de usuarios `/admin`. |
-| **USER** | `detective@forense.test` | `Detective2026!` | Detective: acceso exclusivo a sus propios casos y a las evidencias/sospechosos vinculados a ellos. |
+| **ADMIN** | `admin@forense.test` | `Admin2026!` | Acceso a todos los casos, sospechosos, evidencias y al módulo administrativo de usuarios (`/api/users`). |
+| **USER** | `detective@forense.test` | `Detective2026!` | Acceso exclusivo a los casos propios y a las evidencias/sospechosos vinculados a ellos. |
 
 ---
 
-## 6. Variables de Entorno (`.env.example`)
+## 6. Variables de Entorno Locales (`.env.example`)
 
-Configurar en el archivo `.env` local (este archivo **NUNCA** se incluye en el control de versiones):
+Configuración para el archivo `.env` en entorno de desarrollo local:
 
 ```env
 # Entorno y Puerto
@@ -90,8 +129,8 @@ DIRECT_URL="postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler
 JWT_SECRET="clave_secreta_jwt_de_alta_entropia_minimo_32_caracteres"
 JWT_EXPIRES_IN=1d
 
-# CORS (Origen exacto del Frontend cliente, sin barra final)
-CORS_ORIGIN=https://sistema-investigacion-criminal-fron.vercel.app
+# CORS (Origen local del frontend en desarrollo)
+CORS_ORIGIN=http://localhost:3000
 
 # Almacenamiento de Imágenes (Supabase Storage)
 SUPABASE_URL="https://[PROJECT_REF].supabase.co"
@@ -101,35 +140,33 @@ SUPABASE_BUCKET=case-images
 
 ---
 
-## 7. Catálogo Completo de Endpoints de la API
+## 7. Catálogo de Endpoints de la API
 
-Todas las rutas privadas exigen la cabecera `Authorization: Bearer <token>`.  
-Para consultar ejemplos interactivos de solicitudes y respuestas HTTP, revisar el archivo [`docs/api-examples.http`](docs/api-examples.http).
+La API expone los siguientes endpoints REST. Ejemplos listos para ejecutar se encuentran en [`docs/api-examples.http`](docs/api-examples.http).
 
-### A. Autenticación y Perfil (`/api/auth`)
+### A. Autenticación (`/api/auth`)
 
 | Método | Endpoint | Acceso | Descripción |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Público | Registro de nuevos usuarios (rol `USER` por defecto). Valida contraseña segura. |
-| `POST` | `/api/auth/login` | Público | Autenticación de credenciales y generación del token JWT. |
-| `GET` | `/api/auth/me` | Autenticado | Retorna los datos y rol del usuario actualmente autenticado. |
+| `POST` | `/api/auth/register` | Público | Registro de usuario. Valida nombre (2 a 80 caracteres), correo válido y contraseña entre 8 y 72 caracteres con al menos una letra y un número. Rol por defecto: `USER`. |
+| `POST` | `/api/auth/login` | Público | Autenticación con correo y contraseña. Retorna token JWT (expira en 1 día) y datos del usuario. |
+| `GET` | `/api/auth/me` | Autenticado | Retorna los datos y rol del usuario autenticado. |
 
 ### B. Gestión de Usuarios (`/api/users`)
 
 | Método | Endpoint | Acceso | Descripción |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/users` | Admin | Listado paginado de usuarios con filtros por rol, estado y búsqueda textual (`q`). |
-| `GET` | `/api/users/:id` | Admin | Consulta detallada de la ficha de un usuario por su UUID. |
-| `PATCH` | `/api/users/:id/deactivate` | Admin | Desactivación lógica de un usuario. Prohíbe desactivar la propia cuenta en uso. |
+| `GET` | `/api/users` | Admin | Listado paginado de usuarios con filtros por rol, estado y búsqueda textual (`q`). Requiere rol `ADMIN`. |
+| `DELETE` | `/api/users/:id` | Admin | Desactivación lógica de un usuario (`state: INACTIVE`). Requiere rol `ADMIN`. Prohíbe desactivar la propia cuenta en uso. Responde HTTP 204. |
 
 ### C. Expedientes Criminales (`/api/cases`)
 
 | Método | Endpoint | Acceso | Descripción |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/cases` | Autenticado | Listado paginado con filtros (`q`, `status`, `from`, `to`, `ownerId`). Detective solo ve sus propios casos; Admin ve todos. |
-| `POST` | `/api/cases` | Autenticado | Apertura formal de expediente (`CR-0001`). Valida título, descripción (>= 10 chars), lugar y fecha no futura. |
+| `GET` | `/api/cases` | Autenticado | Listado paginado con filtros (`q`, `status`, `from`, `to`, `ownerId`). Detective ve sus casos; Admin ve todos. |
+| `POST` | `/api/cases` | Autenticado | Creación de expediente con numeración correlativa (`CR-0001`). Valida título (3-120), descripción ($\ge 10$ caracteres), lugar (3-120) y fecha no futura. |
 | `GET` | `/api/cases/:id` | Autenticado | Consulta detallada del expediente por UUID. |
-| `PUT` | `/api/cases/:id` | Autenticado | Modificación de datos del caso (título, descripción, lugar, fecha, estado procesal, imagen). |
+| `PUT` | `/api/cases/:id` | Autenticado | Actualización de datos del caso (título, descripción, lugar, fecha, estado `OPEN` / `IN_PROGRESS` / `CLOSED`, imagen). |
 | `DELETE` | `/api/cases/:id` | Autenticado | Desactivación lógica (`state: INACTIVE`) del expediente. Responde HTTP 204. |
 
 ### D. Personas de Interés y Sospechosos (`/api/suspects`)
@@ -137,22 +174,22 @@ Para consultar ejemplos interactivos de solicitudes y respuestas HTTP, revisar e
 | Método | Endpoint | Acceso | Descripción |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/suspects` | Autenticado | Listado paginado con filtros (`caseId`, `status`, `q`). |
-| `POST` | `/api/suspects` | Autenticado | Registro y vinculación de persona de interés a un caso. Valida que el caso no esté cerrado (HTTP 409 Conflict). |
-| `GET` | `/api/suspects/:id` | Autenticado | Consulta detallada de la ficha pericial de un sospechoso. |
-| `PUT` | `/api/suspects/:id` | Autenticado | Modificación de datos del sospechoso (nombre, alias, nivel de sospecha 0-100, estado y foto). |
-| `DELETE` | `/api/suspects/:id` | Autenticado | Desactivación lógica del sospechoso y desvinculación automática de sus evidencias asociadas. Responde HTTP 204. |
+| `POST` | `/api/suspects` | Autenticado | Registro y vinculación de persona de interés a un caso. Valida que el caso no esté cerrado (HTTP 409 Conflict si está `CLOSED`). |
+| `GET` | `/api/suspects/:id` | Autenticado | Consulta detallada de un sospechoso por UUID. |
+| `PUT` | `/api/suspects/:id` | Autenticado | Modificación de sospechoso (nombre, alias, nivel de sospecha 0-100, estado y foto). |
+| `DELETE` | `/api/suspects/:id` | Autenticado | Desactivación lógica del sospechoso y desvinculación de evidencias asociadas. Responde HTTP 204. |
 
-### E. Evidencias Materiales y Peritaje (`/api/evidences`)
+### E. Evidencias Materiales (`/api/evidences`)
 
 | Método | Endpoint | Acceso | Descripción |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/evidences` | Autenticado | Listado paginado con filtros (`caseId`, `suspectId`, `type`, `q`). |
-| `POST` | `/api/evidences` | Autenticado | Fijación de indicio probatorio. Valida que el caso no esté cerrado (HTTP 409), que el sospechoso pertenezca al caso (HTTP 400), relevancia (1 a 5) y fecha no futura. |
-| `GET` | `/api/evidences/:id` | Autenticado | Detalle pericial de una evidencia por UUID. |
-| `PUT` | `/api/evidences/:id` | Autenticado | Modificación probatoria (el `caseId` permanece inmutable). Permitido en casos cerrados para complementar peritajes. |
+| `POST` | `/api/evidences` | Autenticado | Registro de evidencia. Valida que el caso no esté cerrado (HTTP 409), que el sospechoso pertenezca al caso (HTTP 400), relevancia (1 a 5) y fecha no futura. |
+| `GET` | `/api/evidences/:id` | Autenticado | Detalle de una evidencia por UUID. |
+| `PUT` | `/api/evidences/:id` | Autenticado | Modificación de evidencia (`caseId` inmutable; permitido en casos cerrados para complementar información pericial). |
 | `DELETE` | `/api/evidences/:id` | Autenticado | Desactivación lógica (`state: INACTIVE`) de la evidencia. Responde HTTP 204. |
 
-### F. Almacenamiento Pericial y Salud (`/api/uploads` y `/api/health`)
+### F. Almacenamiento de Archivos y Salud (`/api/uploads` y `/api/health`)
 
 | Método | Endpoint | Acceso | Descripción |
 | :--- | :--- | :--- | :--- |
@@ -163,14 +200,14 @@ Para consultar ejemplos interactivos de solicitudes y respuestas HTTP, revisar e
 
 ## 8. Suite de Pruebas Automatizadas
 
-El backend cuenta con una completa batería de pruebas unitarias y de integración construida con **Vitest**:
+El backend cuenta con una batería de pruebas unitarias y de integración construida con **Vitest**:
 - **119 pruebas automatizadas** distribuidas en 14 suites de prueba.
-- Cobertura exhaustiva sobre:
+- Cobertura sobre:
   - Casos de uso de autenticación, usuarios, casos, sospechosos, evidencias y subida de archivos.
   - Validación de esquemas DTO con Zod (rechazo de límites inválidos, fechas futuras y tipos no permitidos).
-  - Políticas de acceso de casos (aislamiento de datos entre detectives y privilegios de comisario).
-  - Middlewares de autenticación JWT, control de roles (`requireRole`), subida con Multer (`handleMulterError`), manejo de errores JSON de body-parser (`entity.parse.failed`, `entity.too.large`) y rutas desconocidas (404 JSON).
-  - Validación de configuración de entorno y longitud de `JWT_SECRET` en producción.
+  - Políticas de acceso de casos (aislamiento de datos entre detectives y privilegios de administrador).
+  - Middlewares de autenticación JWT, control de roles (`requireRole`), subida con Multer, manejo de errores JSON de body-parser (`entity.parse.failed`, `entity.too.large`) y rutas desconocidas (404 JSON).
+  - Validación de variables de entorno y longitud de `JWT_SECRET` ($\ge 32$ caracteres en producción).
 
 Para ejecutar las pruebas:
 ```bash
@@ -186,7 +223,10 @@ npm run typecheck:tests
 
 ## 9. Instalación y Ejecución Local
 
-1. Ubicarse en la raíz del repositorio backend.
+1. Ubicarse en la raíz del repositorio backend:
+   ```bash
+   cd sistema-investigacion-criminal-backend
+   ```
 2. Instalar dependencias exactas:
    ```bash
    npm ci
@@ -204,61 +244,56 @@ npm run typecheck:tests
    ```bash
    npm run dev
    ```
-6. Ejecutar la suite completa de pruebas:
-   ```bash
-   npm test
-   ```
 
 ---
 
-## 10. Arquitectura de Despliegue e Infraestructura Cloud
+## 10. Despertar el Servicio de Render antes de la Sustentación
 
-El ecosistema de producción del backend opera sobre una arquitectura desacoplada basada en la nube:
+Render suspende los servicios web inactivos tras 15 minutos en planes gratuitos. Para activarlo antes de una presentación o prueba:
+1. Abrir en el navegador: [https://sistema-investigacion-criminal-backend.onrender.com/api/health](https://sistema-investigacion-criminal-backend.onrender.com/api/health)
+2. Esperar entre 30 y 50 segundos hasta recibir respuesta:
+   ```json
+   {
+     "status": "ok",
+     "service": "Sistema de Investigación Criminal API",
+     "timestamp": "2026-11-10T..."
+   }
+   ```
+3. Una vez responda HTTP 200, la API permanecerá activa para la navegación y pruebas del frontend.
 
-### 10.1. Topología de Servicios
-- **Capa de Cómputo (PaaS - Render Web Service)**: Servicio web contenerizado en Node.js 24 con despliegue continuo (Continuous Deployment) vinculado a la rama `main` del repositorio.
-- **Capa de Persistencia Relacional (BaaS - Supabase PostgreSQL)**: Base de datos PostgreSQL gestionada en la nube con arquitectura de doble enrutador de conexiones (Connection Pooling):
-  - **Transaction Pooler (Puerto 6543 con PgBouncer)**: Asignado a `DATABASE_URL` para maximizar la concurrencia y mitigar la sobrecarga de conexiones efímeras en las peticiones HTTP del backend.
-  - **Session Pooler (Puerto 5432)**: Asignado a `DIRECT_URL` para permitir la ejecución de transacciones DDL, sentencias de migración de esquema con Prisma Migrate y scripts de aprovisionamiento.
-- **Capa de Almacenamiento de Objetos (Supabase Storage)**: Bucket pericial `case-images` configurado con políticas de seguridad a nivel de fila (RLS) para lectura pública y mutación autorizada.
+---
 
-### 10.2. Pipeline Automatizado de Construcción y Migración (CI/CD)
-Cada confirmación en la rama `main` dispara automáticamente la siguiente secuencia de construcción en el pipeline de despliegue:
-```bash
-npm ci --include=dev && npx prisma generate && npx prisma migrate deploy && npm run build
-```
-1. **Instalación Reproducible (`npm ci --include=dev`)**: Garantiza la presencia exacta de dependencias de compilación y tipado (`typescript`, `@types/*`).
-2. **Generación de Artefactos Tipados (`prisma generate`)**: Sincroniza el cliente ORM fuertemente tipado según el esquema `schema.prisma`.
-3. **Migraciones Atómicas (`prisma migrate deploy`)**: Aplica migraciones SQL pendientes sin intervención manual directa sobre la base de datos.
-4. **Compilación de Producción (`npm run build`)**: Transpila el código fuente TypeScript de `src/` a JavaScript optimizado en `dist/`.
+## 11. Arquitectura de Despliegue en Producción
 
-El contenedor arranca mediante `npm start` (`node dist/index.js`), con monitoreo perimetral periódico a través del punto de verificación `/api/health`.
+### 11.1. Topología de Servicios
+- **Capa de Cómputo (Render Web Service)**: Servicio web contenerizado en Node.js con despliegue continuo vinculado a la rama `main` de GitHub.
+- **Capa de Persistencia Relacional (Supabase PostgreSQL)**: Base de datos PostgreSQL en la nube con doble esquema de conexión:
+  - **Transaction Pooler (Puerto 6543 con PgBouncer)**: Asignado a `DATABASE_URL` para transacciones de la API.
+  - **Session Pooler (Puerto 5432)**: Asignado a `DIRECT_URL` para migraciones de Prisma y scripts de seed.
+- **Capa de Almacenamiento de Archivos (Supabase Storage)**: Bucket `case-images` configurado con políticas de lectura pública y subida autenticada.
 
-### 10.3. Matriz de Variables de Entorno en Producción
-| Variable | Descripción Arquitectónica |
+### 11.2. Pipeline de Construcción y Arranque en Render
+- **Build Command**:
+  ```bash
+  npm ci --include=dev && npx prisma generate && npx prisma migrate deploy && npm run build
+  ```
+- **Start Command**:
+  ```bash
+  node dist/server.js
+  ```
+  *(o `npm start`)*
+- **Health Check Path**: `/api/health`
+
+### 11.3. Matriz de Variables de Entorno en Producción
+| Variable | Valor / Propósito |
 | :--- | :--- |
-| `NODE_ENV` | Modo de ejecución del runtime (`production`). |
-| `PORT` | Puerto de escucha asignado dinámicamente por la plataforma de hosting (`4000` o asignado por el host). |
-| `DATABASE_URL` | Enlace al Transaction Pooler (puerto 6543) optimizado para transacciones ACID de la API. |
-| `DIRECT_URL` | Enlace al Session Pooler (puerto 5432) utilizado exclusivamente para DDL y migraciones. |
-| `JWT_SECRET` | Llave criptográfica de alta entropía ($\ge 32$ caracteres) para firma y verificación de tokens. |
-| `JWT_EXPIRES_IN` | Tiempo de vida de los tokens de acceso (`1d`). |
-| `CORS_ORIGIN` | Origen autorizado estricto (`https://sistema-investigacion-criminal-fron.vercel.app`), mitigando accesos de orígenes no confiables. |
-| `SUPABASE_URL` | Endpoint base del proyecto Supabase para la API de Storage. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Credencial administrativa con privilegios para gestión segura de buckets y firmas de subida. |
-| `SUPABASE_BUCKET` | Identificador del contenedor de objetos periciales (`case-images`). |
-
-### 10.4. Monitoreo y Verificación Operativa de la API
-El estado operativo del servicio y la conectividad a la infraestructura pueden auditarse mediante el endpoint público de diagnóstico:
-```http
-GET /api/health HTTP/1.1
-Host: sistema-investigacion-criminal-backend.onrender.com
-```
-Respuesta esperada (HTTP 200 OK):
-```json
-{
-  "status": "ok",
-  "service": "Sistema de Investigación Criminal API",
-  "timestamp": "2026-11-10T22:21:37.754Z"
-}
-```
+| `NODE_ENV` | `production` |
+| `PORT` | Asignado automáticamente por Render (`10000` o puerto del host). |
+| `DATABASE_URL` | Cadena al Transaction Pooler (puerto 6543 con `?pgbouncer=true`). |
+| `DIRECT_URL` | Cadena al Session Pooler (puerto 5432 en el mismo host del pooler). |
+| `JWT_SECRET` | Clave criptográfica segura con al menos 32 caracteres. |
+| `JWT_EXPIRES_IN` | `1d` |
+| `CORS_ORIGIN` | `https://sistema-investigacion-criminal-fron.vercel.app` (sin barra final). |
+| `SUPABASE_URL` | `https://[PROJECT_REF].supabase.co` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Clave de servicio de Supabase para subida autenticada de imágenes. |
+| `SUPABASE_BUCKET` | `case-images` |
