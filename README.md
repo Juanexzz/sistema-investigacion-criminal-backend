@@ -55,11 +55,11 @@
 
 ## 2. Enlaces del Proyecto
 
-- **API en Producción (Render)**: `https://sistema-investigacion-criminal-backend.onrender.com`
-- **Health Check de la API**: `https://sistema-investigacion-criminal-backend.onrender.com/api/health`
-- **Frontend en Producción (Vercel)**: `https://sistema-investigacion-criminal-fron.vercel.app`
-- **Repositorio Frontend (GitHub)**: https://github.com/Juanexzz/sistema-investigacion-criminal-frontend
-- **Monorepo Histórico Original**: https://github.com/juanfer2006/patria_milagro_web
+- **API en Producción (Render)**: [https://sistema-investigacion-criminal-backend.onrender.com](https://sistema-investigacion-criminal-backend.onrender.com)
+- **Health Check de la API**: [https://sistema-investigacion-criminal-backend.onrender.com/api/health](https://sistema-investigacion-criminal-backend.onrender.com/api/health)
+- **Frontend en Producción (Vercel)**: [https://sistema-investigacion-criminal-fron.vercel.app](https://sistema-investigacion-criminal-fron.vercel.app)
+- **Repositorio Frontend (GitHub)**: [https://github.com/Juanexzz/sistema-investigacion-criminal-frontend](https://github.com/Juanexzz/sistema-investigacion-criminal-frontend)
+- **Monorepo Histórico Original**: [https://github.com/juanfer2006/patria_milagro_web](https://github.com/juanfer2006/patria_milagro_web)
 
 ---
 
