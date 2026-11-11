@@ -20,6 +20,15 @@ export function createApp(): Express {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  // Ruta raíz pública
+  app.get('/', (_req, res) => {
+    res.status(200).json({
+      name: 'Sistema de Investigación Criminal API',
+      status: 'ok',
+      health: '/api/health',
+    });
+  });
+
   // Montar rutas de la API bajo /api
   app.use('/api', createApiRouter());
 
